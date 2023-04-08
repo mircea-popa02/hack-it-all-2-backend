@@ -85,8 +85,8 @@ const createPayment = async (req, res, next) => {
   let user;
   try {
     user = await User.findById(destination);
-    let p1 = await User.findById(creator);
-    let p2 = await User.findById(destination);
+    let p1 = await User.findById(destination);
+    let p2 = await User.findById(creator);
     p1.balance = p1.balance - value;
     p2.balance = p2.balance + value;
     await p1.save();
@@ -113,7 +113,7 @@ const createPayment = async (req, res, next) => {
     // creator.balance = creator.balance - value;
     // destination.balance = destination.balance + value;
     user.payments.push(createdPayment);
-    
+
     // await creator.save({ session: sess });
     // await destination.save({ session: sess });
     await user.save({ session: sess });
