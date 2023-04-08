@@ -21,4 +21,6 @@ router.post(
 
 router.post("/login", usersController.login);
 
+router.patch("/:uid", usersController.updateAccLimit);
+
 module.exports = router;

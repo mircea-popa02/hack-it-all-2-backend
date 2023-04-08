@@ -77,6 +77,7 @@ const signup = async (req, res, next) => {
     group: "643185b22613671bb452c29d",
     places: [],
     balance: 0,
+    accountlimit: 0,
   });
 
   try {
@@ -121,7 +122,38 @@ const login = async (req, res, next) => {
   });
 };
 
+const updateAccLimit = async (req, res, next) => {
+  const { accountlimit } = req.body;
+  const userId = req.params.uid;
+
+  let user;
+  try {
+    user = await User.findById(userId);
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not update user.",
+      500
+    );
+    return next(error);
+  }
+
+  user.accountlimit = accountlimit;
+
+  try {
+    await user.save();
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not update place.",
+      500
+    );
+    return next(error);
+  }
+
+  res.status(200).json({ user: user.toObject({ getters: true }) });
+};
+
 exports.getUsers = getUsers;
 exports.signup = signup;
 exports.login = login;
 exports.getUserByName = getUserByName;
+exports.updateAccLimit = updateAccLimit;
