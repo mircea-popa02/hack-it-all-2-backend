@@ -17,12 +17,6 @@ router.post(
 );
 
 router.post(
-  "/ing",
-  [check("value").not().isEmpty()],
-  paymentController.createPaymentING
-);
-
-router.post(
   "/split/:nrOfPeople",
   [check("value").not().isEmpty()],
   [check("type").not().isEmpty()],

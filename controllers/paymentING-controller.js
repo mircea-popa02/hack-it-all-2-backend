@@ -78,7 +78,7 @@ const createPayment = async (req, res, next) => {
     destination,
     value,
     type,
-    creator,
+    creator: '6431e3109049485668c4841c',
     date: Date.now(),
   });
 
@@ -130,66 +130,7 @@ const createPayment = async (req, res, next) => {
 };
 
 /////////////////////////////////////////////////////////////
-const createPaymentING = async (req, res, next) => {
-  let { description, destination, value, type } = req.body;
 
-  const createdPayment = new Payment({
-    description,
-    destination,
-    value,
-    type,
-    creator: "6431e3109049485668c4841c",
-    date: Date.now(),
-  });
-
-  let user;
-  try {
-    user = await User.findById("6431e3109049485668c4841c");
-    let p1 = await User.findById(destination);
-    let p2 = await User.findById("6431e3109049485668c4841c");
-    p1.balance = p1.balance - value;
-    p2.balance = p2.balance + value;
-    await p1.save();
-    await p2.save();
-  } catch (err) {
-    const error = new HttpError(
-      "Creating payment failed, please try again.",
-      500
-    );
-    return next(error);
-  }
-
-  if (!user) {
-    const error = new HttpError("Could not find user for provided id.", 404);
-    return next(error);
-  }
-
-  console.log(user);
-
-  try {
-    const sess = await mongoose.startSession();
-    sess.startTransaction();
-    await createdPayment.save({ session: sess });
-    // creator.balance = creator.balance - value;
-    // destination.balance = destination.balance + value;
-    user.payments.push(createdPayment);
-
-    // await creator.save({ session: sess });
-    // await destination.save({ session: sess });
-    await user.save({ session: sess });
-    await sess.commitTransaction();
-  } catch (err) {
-    const error = new HttpError(
-      "Creating place failed, please try again.",
-      500
-    );
-    return next(error);
-  }
-
-  res.status(201).json({ payment: createdPayment });
-};
-
-/////////////////////////////////////////////////////////////
 const deletePayment = async (req, res, next) => {
   const paymentID = req.params.pid;
 
@@ -230,12 +171,18 @@ const deletePayment = async (req, res, next) => {
 const createPaymentSplit = async (req, res, next) => {
   const nrOfPeople = req.params.nrOfPeople;
 
-  const { description, value, type, creator } = req.body;
+  // const errors = validationResult(req);
+  // if (!errors.isEmpty()) {
+  //   return next(
+  //     new HttpError("Invalid inputs passed, please check your data.", 422)
+  //   );
+  // }
+  const { description, destination, value, type, creator } = req.body;
 
   const createdPayment = new Payment({
     description,
-    destination: "6431ed1a8deaff540c2022e6",
-    value: value / nrOfPeople,
+    destination,
+    value,
     type,
     creator,
   });
@@ -279,4 +226,3 @@ exports.createPayment = createPayment;
 exports.deletePayment = deletePayment;
 exports.createPaymentSplit = createPaymentSplit;
 exports.getPaymentByUserID = getPaymentByUserID;
-exports.createPaymentING = createPaymentING;
