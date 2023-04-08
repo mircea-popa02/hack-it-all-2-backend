@@ -84,7 +84,7 @@ const createPayment = async (req, res, next) => {
 
   let user;
   try {
-    user = await User.findById(creator);
+    user = await User.findById(destination);
   } catch (err) {
     const error = new HttpError(
       "Creating place failed, please try again.",
