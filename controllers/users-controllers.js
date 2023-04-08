@@ -76,6 +76,7 @@ const signup = async (req, res, next) => {
     password,
     group: "643185b22613671bb452c29d",
     places: [],
+    balance: 0,
   });
 
   try {

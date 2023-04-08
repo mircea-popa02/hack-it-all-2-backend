@@ -71,7 +71,7 @@ const createPayment = async (req, res, next) => {
       new HttpError("Invalid inputs passed, please check your data.", 422)
     );
   }
-  const { description, destination, value, type, creator } = req.body;
+  let { description, destination, value, type, creator } = req.body;
 
   const createdPayment = new Payment({
     description,
@@ -85,6 +85,12 @@ const createPayment = async (req, res, next) => {
   let user;
   try {
     user = await User.findById(destination);
+    let p1 = await User.findById(creator);
+    let p2 = await User.findById(destination);
+    p1.balance = p1.balance - value;
+    p2.balance = p2.balance + value;
+    await p1.save();
+    await p2.save();
   } catch (err) {
     const error = new HttpError(
       "Creating place failed, please try again.",
@@ -104,9 +110,12 @@ const createPayment = async (req, res, next) => {
     const sess = await mongoose.startSession();
     sess.startTransaction();
     await createdPayment.save({ session: sess });
-    creator.balance = creator.balance - value;
-    destination.balance = destination.balance + value;
+    // creator.balance = creator.balance - value;
+    // destination.balance = destination.balance + value;
     user.payments.push(createdPayment);
+    
+    // await creator.save({ session: sess });
+    // await destination.save({ session: sess });
     await user.save({ session: sess });
     await sess.commitTransaction();
   } catch (err) {
@@ -119,6 +128,8 @@ const createPayment = async (req, res, next) => {
 
   res.status(201).json({ payment: createdPayment });
 };
+
+/////////////////////////////////////////////////////////////
 
 const deletePayment = async (req, res, next) => {
   const paymentID = req.params.pid;
