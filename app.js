@@ -18,6 +18,16 @@ app.use(bodyParser.json());
 
 var jsonParser = bodyParser.json();
 
+// add cors
+const cors = require("cors");
+app.use(
+  cors({
+    origin: "*",
+    methods: "*",
+    allowedHeaders: "*",
+  })
+);
+
 const { OpenAIApi, Configuration } = require("openai");
 const configuration = new Configuration({
   apiKey: "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",
