@@ -13,6 +13,7 @@ const userSchema = new Schema({
   payments: [{ type: mongoose.Types.ObjectId, required: true, ref: "Payment" }],
   group: { type: mongoose.Types.ObjectId, required: true, ref: "Group" },
   balance: { type: Number, required: true },
+  accountlimit: { type: Number, required: true },
 });
 
 userSchema.plugin(uniqueValidator);
