@@ -10,7 +10,15 @@ router.get("/", paymentController.getPayments);
 router.post(
   "/",
   [check("value").not().isEmpty()],
+  [check("type").not().isEmpty()],
   paymentController.createPayment
+);
+
+router.post(
+  "/split/:nrOfPeople",
+  [check("value").not().isEmpty()],
+  [check("type").not().isEmpty()],
+  paymentController.createPaymentSplit
 );
 
 router.delete("/:pid", paymentController.deletePayment);

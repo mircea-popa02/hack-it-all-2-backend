@@ -30,13 +30,15 @@ const createPayment = async (req, res, next) => {
       new HttpError("Invalid inputs passed, please check your data.", 422)
     );
   }
-  const { description, destination, value, creator } = req.body;
+  const { description, destination, value, type, creator } = req.body;
 
   const createdPayment = new Payment({
     description,
     destination,
     value,
+    type,
     creator,
+    date: Date.now(),
   });
 
   let user;
@@ -112,6 +114,60 @@ const deletePayment = async (req, res, next) => {
   res.status(200).json({ message: "Deleted payment." });
 };
 
+const createPaymentSplit = async (req, res, next) => {
+  const nrOfPeople = req.params.nrOfPeople;
+
+  // const errors = validationResult(req);
+  // if (!errors.isEmpty()) {
+  //   return next(
+  //     new HttpError("Invalid inputs passed, please check your data.", 422)
+  //   );
+  // }
+  const { description, destination, value, type, creator } = req.body;
+
+  const createdPayment = new Payment({
+    description,
+    destination,
+    value,
+    type,
+    creator,
+  });
+
+  let user;
+  try {
+    user = await User.findById(creator);
+  } catch (err) {
+    const error = new HttpError(
+      "Creating place failed, please try again.",
+      500
+    );
+    return next(error);
+  }
+
+  if (!user) {
+    const error = new HttpError("Could not find user for provided id.", 404);
+    return next(error);
+  }
+
+  console.log(user);
+
+  try {
+    const sess = await mongoose.startSession();
+    sess.startTransaction();
+    await createdPayment.save({ session: sess });
+    user.payments.push(createdPayment);
+    await user.save({ session: sess });
+    await sess.commitTransaction();
+  } catch (err) {
+    const error = new HttpError(
+      "Creating place failed, please try again.",
+      500
+    );
+    return next(error);
+  }
+};
+
 exports.getPayments = getPayments;
 exports.createPayment = createPayment;
 exports.deletePayment = deletePayment;
+exports.createPaymentSplit = createPaymentSplit;
