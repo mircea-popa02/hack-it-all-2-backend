@@ -6,6 +6,7 @@ const placesRoutes = require("./routes/places-routes");
 const usersRoutes = require("./routes/users-routes");
 const paymentRoutes = require("./routes/payment-routes");
 const chatRoutes = require("./routes/chat-routes");
+const groupRoutes = require("./routes/group-routes");
 const HttpError = require("./models/http-error");
 const { application } = require("express");
 
@@ -35,7 +36,6 @@ app.post("/api/chat", jsonParser, async function (req, res) {
   res.send(completion.data.choices[0].message);
 });
 
-
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
@@ -50,6 +50,7 @@ app.use((req, res, next) => {
 app.use("/api/places", placesRoutes);
 app.use("/api/users", usersRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/groups", groupRoutes);
 
 app.use((req, res, next) => {
   const error = new HttpError("Could not find this route.", 404);
@@ -64,10 +65,7 @@ app.use((error, req, res, next) => {
   res.json({ message: error.message || "An unknown error occurred!" });
 });
 
-
-
 // var cors = require("cors");
-
 
 mongoose
   .connect(

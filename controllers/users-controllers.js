@@ -74,6 +74,7 @@ const signup = async (req, res, next) => {
     email,
     image: "https://live.staticflickr.com/7631/26849088292_36fc52ee90_b.jpg",
     password,
+    group: "643185b22613671bb452c29d",
     places: [],
   });
 
