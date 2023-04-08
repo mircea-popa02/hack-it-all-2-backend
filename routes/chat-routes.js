@@ -1,7 +1,7 @@
 const express = require("express");
 const { check } = require("express-validator");
 
-require("dotenv").config();
+
 
 const chatControllers = require("../controllers/chat-controller");
 
@@ -19,9 +19,9 @@ const configuration = new Configuration({
 const openai = new OpenAIApi(configuration);
 
 router.post("/", jsonParser, async function (req, res) {
-  //   console.log(req.body);
+  console.log(req.body);
   res.setHeader("Content-Type", "application/json");
-  res.setHeader("Access-Control-Allow-Origin", "*");
+  // res.setHeader("Access-Control-Allow-Origin", "*");
   const completion = await openai.createChatCompletion({
     model: "gpt-3.5-turbo",
     messages: [{ role: "user", content: req.body.data }],

@@ -11,7 +11,30 @@ const { application } = require("express");
 
 const app = express();
 
+require("dotenv").config();
+
 app.use(bodyParser.json());
+
+var jsonParser = bodyParser.json();
+
+const { OpenAIApi, Configuration } = require("openai");
+const configuration = new Configuration({
+  apiKey: "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",
+});
+const openai = new OpenAIApi(configuration);
+
+app.post("/api/chat", jsonParser, async function (req, res) {
+  console.log(req.body);
+  res.setHeader("Content-Type", "application/json");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  const completion = await openai.createChatCompletion({
+    model: "gpt-3.5-turbo",
+    messages: [{ role: "user", content: req.body.data }],
+  });
+  console.log(completion.data.choices[0].message);
+  res.send(completion.data.choices[0].message);
+});
+
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
@@ -27,7 +50,6 @@ app.use((req, res, next) => {
 app.use("/api/places", placesRoutes);
 app.use("/api/users", usersRoutes);
 app.use("/api/payments", paymentRoutes);
-app.use("/api/chat", chatRoutes);
 
 app.use((req, res, next) => {
   const error = new HttpError("Could not find this route.", 404);
@@ -41,6 +63,11 @@ app.use((error, req, res, next) => {
   res.status(error.code || 500);
   res.json({ message: error.message || "An unknown error occurred!" });
 });
+
+
+
+// var cors = require("cors");
+
 
 mongoose
   .connect(
