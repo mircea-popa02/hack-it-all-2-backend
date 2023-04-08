@@ -23,6 +23,47 @@ const getPayments = async (req, res, next) => {
   });
 };
 
+/////////////////////////////////////////////////////////////
+
+const getPaymentByUserID = async (req, res, next) => {
+  const userId = req.params.uid;
+
+  // let places;
+  let expenses;
+  let incomes;
+  try {
+    expenses = await Payment.find({
+      creator: userId,
+    });
+    incomes = await Payment.find({
+      destination: userId,
+    });
+  } catch (err) {
+    const error = new HttpError(
+      "Fetching places failed, please try again later.",
+      500
+    );
+    return next(error);
+  }
+
+  // if (!places || places.length === 0) {
+  // if (!userWithPlaces || userWithPlaces.places.length === 0) {
+  //   return next(
+  //     new HttpError("Could not find places for the provided user id.", 404)
+  //   );
+  // }
+
+  res.json({
+    incomes: incomes.map((income) => income.toObject({ getters: true })),
+    expenses: expenses.map((expense) => expense.toObject({ getters: true })),
+    // places: userWithPlaces.places.map((place) =>
+    //   place.toObject({ getters: true })
+    // ),
+  });
+};
+
+/////////////////////////////////////////////////////////////
+
 const createPayment = async (req, res, next) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -171,3 +212,4 @@ exports.getPayments = getPayments;
 exports.createPayment = createPayment;
 exports.deletePayment = deletePayment;
 exports.createPaymentSplit = createPaymentSplit;
+exports.getPaymentByUserID = getPaymentByUserID;

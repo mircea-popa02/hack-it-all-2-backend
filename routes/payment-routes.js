@@ -7,6 +7,8 @@ const router = express.Router();
 
 router.get("/", paymentController.getPayments);
 
+router.get("/ceva/:uid", paymentController.getPaymentByUserID);
+
 router.post(
   "/",
   [check("value").not().isEmpty()],
