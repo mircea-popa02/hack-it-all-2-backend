@@ -104,6 +104,8 @@ const createPayment = async (req, res, next) => {
     const sess = await mongoose.startSession();
     sess.startTransaction();
     await createdPayment.save({ session: sess });
+    creator.balance = creator.balance - value;
+    destination.balance = destination.balance + value;
     user.payments.push(createdPayment);
     await user.save({ session: sess });
     await sess.commitTransaction();
