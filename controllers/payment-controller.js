@@ -151,8 +151,8 @@ const createPaymentING = async (req, res, next) => {
     user = await User.findById("6431e3109049485668c4841c");
     let p1 = await User.findById(destination);
     let p2 = await User.findById("6431e3109049485668c4841c");
-    p1.balance = p1.balance - value;
-    p2.balance = p2.balance + value;
+    p1.balance = (+p1.balance) + (+value);
+    // p2.balance = p2.balance + value;
     await p1.save();
     await p2.save();
   } catch (err) {
