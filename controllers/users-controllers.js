@@ -15,8 +15,9 @@ const getUsers = async (req, res, next) => {
     );
     return next(error);
   }
-  res.json({ users: users.map((user) => user.toObject({ getters: true })) });
+  res.json({ users: users.map((user) => user.toObject({ getters: true })) });
 };
+
 
 const getUserByName = async (req, res, next) => {
   const username = req.params.username;
@@ -28,14 +29,14 @@ const getUserByName = async (req, res, next) => {
     user = await User.findOne({ name: username });
   } catch (err) {
     const error = new HttpError(
-      "Fetching user failed, please try again later.",
+      "Fetching user failed, please try again later." + err,
       500
     );
     return next(error);
   }
 
   if (!user || user.length === 0) {
-    return next(new HttpError("Could not find user for the provided id.", 404));
+    return next(new HttpError("Could not find user for the provided id." + err, 404));
   }
 
   res.json({ user: user.toObject({ getters: true }) });
@@ -84,7 +85,7 @@ const signup = async (req, res, next) => {
     await createdUser.save();
   } catch (err) {
     const error = new HttpError(
-      "Signing up failed, please try again later.",
+      "Creating user failed, please try again later.",
       500
     );
     return next(error);

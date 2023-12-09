@@ -1,6 +1,8 @@
 const express = require("express");
 const bodyParser = require("body-parser");
+
 const mongoose = require("mongoose");
+
 
 const placesRoutes = require("./routes/places-routes");
 const usersRoutes = require("./routes/users-routes");
@@ -48,11 +50,11 @@ app.post("/api/chat", jsonParser, async function (req, res) {
 
 app.use((req, res, next) => {
   res.setHeader("Access-Control-Allow-Origin", "*");
-  res.setHeader(
-    "Access-Control-Allow-Headers",
-    "Origin, X-Requested-With, Content-Type, Accept, Authorization"
-  );
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE");
+  // res.setHeader(
+  //   "Access-Control-Allow-Headers",
+  //   "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+  // );
+  // res.setHeader("Access-Control-Allow-Methods", "GET, POST, PATCH, DELETE");
 
   next();
 });
@@ -75,15 +77,21 @@ app.use((error, req, res, next) => {
   res.json({ message: error.message || "An unknown error occurred!" });
 });
 
-// var cors = require("cors");
-
 mongoose
-  .connect(
-    `mongodb+srv://mci42:camera109@cluster0.wb05rph.mongodb.net/test?retryWrites=true&w=majority`
-  )
+  .connect("mongodb+srv://mci42:camera109@cluster1.h9u5uu9.mongodb.net/?retryWrites=true&w=majority", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
   .then(() => {
-    app.listen(5000);
+    console.log("Connected to MongoDB");
   })
   .catch((err) => {
-    console.log(err);
+    console.error("MongoDB connection error", err);
   });
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
+
