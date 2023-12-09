@@ -29,14 +29,14 @@ const getUserByName = async (req, res, next) => {
     user = await User.findOne({ name: username });
   } catch (err) {
     const error = new HttpError(
-      "Fetching user failed, please try again later." + err,
+      "Fetching user failed, please try again later.",
       500
     );
     return next(error);
   }
 
   if (!user || user.length === 0) {
-    return next(new HttpError("Could not find user for the provided id." + err, 404));
+    return next(new HttpError("Could not find user for the provided id.", 404));
   }
 
   res.json({ user: user.toObject({ getters: true }) });
@@ -79,6 +79,7 @@ const signup = async (req, res, next) => {
     places: [],
     balance: 0,
     accountlimit: 0,
+    coins: 0,
   });
 
   try {

@@ -7,6 +7,15 @@ const Place = require("../models/place");
 const User = require("../models/user");
 const Payment = require("../models/payment");
 
+
+const redeeemableCodesMap = {
+  "123456": 200,
+  "ABCDEF": 100,
+  "GHIJKL": 50,
+  "MNOPQR": 20
+}
+
+
 const getPayments = async (req, res, next) => {
   let payments;
   try {
@@ -142,17 +151,15 @@ const createPaymentING = async (req, res, next) => {
     destination,
     value,
     type,
-    creator: "6431e3109049485668c4841c",
+    creator: "6574961721985216835a62a0",
     date: Date.now(),
   });
 
   let user;
   try {
-    user = await User.findById("6431e3109049485668c4841c");
     let p1 = await User.findById(destination);
-    let p2 = await User.findById("6431e3109049485668c4841c");
+    let p2 = await User.findById("6574961721985216835a62a0");
     p1.balance = (+p1.balance) + (+value);
-    // p2.balance = p2.balance + value;
     await p1.save();
     await p2.save();
   } catch (err) {
@@ -163,12 +170,11 @@ const createPaymentING = async (req, res, next) => {
     return next(error);
   }
 
-  if (!user) {
+  if (!p1) {
     const error = new HttpError("Could not find user for provided id.", 404);
     return next(error);
   }
 
-  console.log(user);
 
   try {
     const sess = await mongoose.startSession();
@@ -278,6 +284,34 @@ const createPaymentSplit = async (req, res, next) => {
   }
 };
 
+// check redeemaable codes
+const isRedeemable = (code) => {
+  return redeeemableCodesMap[code] !== undefined;
+}
+
+const redeeemCode = async (req, res, next) => {
+  const { code, uid } = req.body;
+
+  let user;
+  try {
+    if (isRedeemable(code)) {
+      user = await User.findById(uid);
+      user.coins = user.coins + redeeemableCodesMap[code];
+      await user.save();
+    } else {
+      throw new Error("Code not found");
+    }
+  } catch (err) {
+    const error = new HttpError(
+      "Error while redeeming code.",
+      500
+    );
+    return next(error);
+  }
+  return res.status(200).json({ message: "Code redeemed. You have received " + redeeemableCodesMap[code] + " coins." });
+}
+
+exports.redeeemCode = redeeemCode;
 exports.getPayments = getPayments;
 exports.createPayment = createPayment;
 exports.deletePayment = deletePayment;

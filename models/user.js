@@ -14,6 +14,7 @@ const userSchema = new Schema({
   group: { type: mongoose.Types.ObjectId, required: true, ref: "Group" },
   balance: { type: Number, required: true },
   accountlimit: { type: Number, required: true },
+  coins: { type: Number, required: true },
 });
 
 userSchema.plugin(uniqueValidator);

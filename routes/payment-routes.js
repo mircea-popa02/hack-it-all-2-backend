@@ -29,6 +29,12 @@ router.post(
   paymentController.createPaymentSplit
 );
 
+router.post(
+  "/redeem",
+  [check("value").not().isEmpty()],
+  paymentController.redeeemCode
+);
+
 router.delete("/:pid", paymentController.deletePayment);
 
 module.exports = router;
