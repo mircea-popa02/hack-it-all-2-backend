@@ -320,7 +320,16 @@ const buyItem = async (req, res, next) => {
     if (user.coins < price) {
       throw new Error("Not enough coins");
     }
+
     user.coins = user.coins - price;
+    if (name === "Gold Membership 30 days") {
+      user.accountType = "gold";
+      user.premiumAccountStartDate = Date.now();
+    }
+    if (name === "Platinum Membership 30 days") {
+      user.accountType = "platinum";
+      user.premiumAccountStartDate = Date.now();
+    }
     await user.save();
   } catch (err) {
     const error = new HttpError(
