@@ -15,6 +15,8 @@ const userSchema = new Schema({
   balance: { type: Number, required: true },
   accountlimit: { type: Number, required: true },
   coins: { type: Number, required: true },
+  accountType: { type: String, required: true },
+  premiumAccountStartDate: { type: Date, required: true },
 });
 
 userSchema.plugin(uniqueValidator);

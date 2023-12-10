@@ -23,4 +23,6 @@ router.post("/login", usersController.login);
 
 router.patch("/:uid", usersController.updateAccLimit);
 
+router.post("/upgrade", usersController.upgradeAccount);
+
 module.exports = router;

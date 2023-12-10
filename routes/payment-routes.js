@@ -35,6 +35,12 @@ router.post(
   paymentController.redeeemCode
 );
 
+router.post(
+  "/buyItem",
+  [check("value").not().isEmpty()],
+  paymentController.buyItem
+);
+
 router.delete("/:pid", paymentController.deletePayment);
 
 module.exports = router;

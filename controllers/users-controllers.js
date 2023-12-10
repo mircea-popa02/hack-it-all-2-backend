@@ -80,6 +80,8 @@ const signup = async (req, res, next) => {
     balance: 0,
     accountlimit: 0,
     coins: 0,
+    accountType: "basic",
+    premiumAccountStartDate: new Date(),
   });
 
   try {
@@ -109,6 +111,7 @@ const login = async (req, res, next) => {
     );
     return next(error);
   }
+
 
   if (!existingUser || existingUser.password !== password) {
     const error = new HttpError(
@@ -154,6 +157,60 @@ const updateAccLimit = async (req, res, next) => {
   res.status(200).json({ user: user.toObject({ getters: true }) });
 };
 
+const accountCosts = {
+  basic: 0,
+  gold: 49,
+  platinum: 99
+};
+
+const upgradeAccount = async (req, res, next) => {
+  const { uid, accountType } = req.body;
+
+  let user;
+  try {
+    user = await User.findById(uid);
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not update user.",
+      500
+    );
+    return next(error);
+  }
+
+  if (user.coins < accountCosts[accountType]) {
+    const error = new HttpError(
+      "Something went wrong, could not update user.",
+      500
+    );
+    return next(error);
+  }
+
+  if (user.accountType === "basic") {
+    user.coins -= accountCosts[accountType];
+    user.accountType = accountType;
+    user.premiumAccountStartDate = new Date();
+  }
+
+  if (user.accountType === "gold" && accountType === "platinum") {
+    user.coins -= accountCosts[accountType];
+    user.accountType = accountType;
+    user.premiumAccountStartDate = new Date();
+  }
+  try { 
+    await user.save();
+  } catch (err) {
+    const error = new HttpError(
+      "Something went wrong, could not update place.",
+      500
+    );
+    return next(error);
+  }
+
+  return res.status(200).json({ message: "Congratulations! Account upgraded to " + accountType });
+};
+
+
+exports.upgradeAccount = upgradeAccount;
 exports.getUsers = getUsers;
 exports.signup = signup;
 exports.login = login;

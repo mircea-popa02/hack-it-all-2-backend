@@ -311,6 +311,28 @@ const redeeemCode = async (req, res, next) => {
   return res.status(200).json({ message: "Code redeemed. You have received " + redeeemableCodesMap[code] + " coins." });
 }
 
+const buyItem = async (req, res, next) => {
+  const { uid, price, name } = req.body;
+  let user;
+  try {
+    user = await User.findById(uid);
+    console.log(user);
+    if (user.coins < price) {
+      throw new Error("Not enough coins");
+    }
+    user.coins = user.coins - price;
+    await user.save();
+  } catch (err) {
+    const error = new HttpError(
+      "Error while buying item.",
+      500
+    );
+    return next(error);
+  }
+  return res.status(200).json({ message: "Item " + name + " bought. You have " + user.coins + " coins left." });
+}
+
+exports.buyItem = buyItem;
 exports.redeeemCode = redeeemCode;
 exports.getPayments = getPayments;
 exports.createPayment = createPayment;
